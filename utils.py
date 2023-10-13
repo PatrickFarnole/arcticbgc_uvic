@@ -2,7 +2,7 @@ import xarray as xr
 import numpy as np
 import pandas as pd
 import os
-
+import pyproj
 from datetime import datetime, timedelta
 
 
@@ -73,5 +73,42 @@ def prep_sibd_naa(forcing,year):
     data['sibd50'] = data_tmp[ic_var].groupby('time_counter.year').map(doySIbreak,threshold=0.5,timedim='time_counter').rename('sibd50')
     data['sibd85'] = data_tmp[ic_var].groupby('time_counter.year').map(doySIbreak,threshold=0.85,timedim='time_counter').rename('sibd85')
 
+    return data.rename({'nav_lat':'lat','nav_lon':'lon'})
+
+
+def prep_sibd_asmr(y):
+    """ Uses doySIbreak        
+        Computes day of the year of sea ice breakup for ASMR satellite dataset
+        Mirrors prep_sibd_naa
+    """
+
+    asmrdir = '/tsanta/ahaddon/data/asi-AMSR/'
+    
+    if y==2012:
+        continue  # 2012 only partially available in source dataset so not suited for sibd calculation
+        
+    # LOAD DATA
+    data_amsr = xr.open_mfdataset(asmrdir+f"*{y}*.nc")#, combine='by_coords', chunks={"time": 10})
+    
+    # ASSIGN LAT LON
+    ## Output coordinates are in WGS 84 longitude and latitude
+    projOut = pyproj.Proj(init='epsg:4326')
+    ## projection given in the netCDF file
+    projIn = pyproj.Proj(init='epsg:3411',preserve_units=True)
+    xx, yy = np.meshgrid( data_amsr.x.values, data_amsr.y.values)
+    lon,lat= pyproj.transform(projIn, projOut, xx, yy )
+    data_amsr['lon'] = (('y','x'),lon)
+    data_amsr['lat'] = (('y','x'),lat)
+    coords={'lat': (['y','x'],np.array(data_amsr.lat)),
+            'lon': (['y','x'],np.array(data_amsr.lon))}
+    data_amsr = data_amsr.assign_coords(coords).drop_vars(['x','y','polar_stereographic'])
+    data_amsr = data_amsr.where(data_amsr.lat>60).resample(time="1D").interpolate("linear") # interpolate some missing dates (not all years have 365 data points)
+
+    # MERGE
+    data = xr.Dataset()
+    data['sibd50'] = data_amsr.z.groupby('time.year').map(doySIbreak,threshold=0.5,timedim='time').rename('sibd50').compute()
+    data['sibd85'] = data_amsr.z.groupby('time.year').map(doySIbreak,threshold=0.85,timedim='time').rename('sibd85').compute()
+    
     return data
+
 
