@@ -77,7 +77,7 @@ def prep_sibd_naa(forcing,year):
     return data.rename({'nav_lat':'lat','nav_lon':'lon'})
 
 
-def prep_sibd_asmr(y):
+def prep_sibd_asmr(year):
     """ Uses doySIbreak        
         Computes day of the year of sea ice breakup for ASMR satellite dataset
         Mirrors prep_sibd_naa
@@ -85,11 +85,8 @@ def prep_sibd_asmr(y):
 
     asmrdir = '/tsanta/ahaddon/data/asi-AMSR/'
     
-    if y==2012:
-        continue  # 2012 only partially available in source dataset so not suited for sibd calculation
-        
     # LOAD DATA
-    data_amsr = xr.open_mfdataset(asmrdir+f"*{y}*.nc")#, combine='by_coords', chunks={"time": 10})
+    data_amsr = xr.open_mfdataset(asmrdir+f"*{year}*.nc")#, combine='by_coords', chunks={"time": 10})
     
     # ASSIGN LAT LON
     ## Output coordinates are in WGS 84 longitude and latitude
@@ -111,5 +108,6 @@ def prep_sibd_asmr(y):
     data['sibd85'] = data_amsr.z.groupby('time.year').map(doySIbreak,threshold=0.85,timedim='time').rename('sibd85').compute()
     
     return data
+
 
 
