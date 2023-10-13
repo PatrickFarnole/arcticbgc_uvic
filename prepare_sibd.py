@@ -11,6 +11,9 @@ save_dir = '/home/pfarnole/data/sibd/' # your savedir
 
 # COMPUTE SIBD for ASMR dataset
 for y in range(2003,2020): # Dataset covers 2003-2019
+    # 2012 only partially available in source dataset so not suited for sibd calculation
+    if y==2012:
+        continue
     print(y)
     data = utils.prep_sibd_asmr(y)
     data.to_netcdf(os.path.join(save_dir,f'ASMR_50-85_{y}.nc'))
