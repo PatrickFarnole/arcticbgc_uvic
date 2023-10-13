@@ -58,10 +58,11 @@ def prep_sibd_naa(forcing,year):
         ic_var = 'ileadfrad'
 
     if forcing == 'JRA':
-        datadir1 = '/net/venus/kenes/data/arcticBGC/NAA/IAMIP2-C524.00'
-        datadir2 = '/net/venus/kenes/data/arcticBGC/NAA_IAMIP2/HIST_KN_EXTENSION_C524.08'
-        datafiles = [os.path.join(datadir1,fp) for fp in os.listdir(datadir1) if '_biolog.nc' in fp and f'NAA_1d_{year}' in fp]
-        datafiles += [os.path.join(datadir2,fp) for fp in os.listdir(datadir2) if '_biolog.nc' in fp and f'NAA_1d_{year}' in fp]
+        if year<2018:
+            datadir = '/net/venus/kenes/data/arcticBGC/NAA/IAMIP2-C524.00'
+        else:
+            datadir = '/net/venus/kenes/data/arcticBGC/NAA_IAMIP2/HIST_KN_EXTENSION_C524.08'
+        datafiles = [os.path.join(datadir,fp) for fp in os.listdir(datadir) if '_biolog.nc' in fp and f'NAA_1d_{year}' in fp]
         ic_var = 'ileadfrad'
 
     # LOAD DATA
