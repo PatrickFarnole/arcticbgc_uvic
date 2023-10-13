@@ -68,10 +68,10 @@ def prep_sibd_naa(forcing,year):
     data_tmp = xr.open_mfdataset(datafiles, combine='by_coords', parallel=True, chunks={'time_counter':365,'x':100,'y':100})
     data_tmp = data_tmp.where(data_tmp.nav_lat>60).chunk({'x':100,'y':100}).compute()
 
-    # SAVE SIBD
+    # COMPUTE SIBD
     data = xr.Dataset()
-    data['sibd50'] = data_tmp[ic_var].groupby('time_counter.year').map(dgnst.doySIbreak,threshold=0.5,timedim='time_counter').rename('sibd50')
-    data['sibd85'] = data_tmp[ic_var].groupby('time_counter.year').map(dgnst.doySIbreak,threshold=0.85,timedim='time_counter').rename('sibd85')
+    data['sibd50'] = data_tmp[ic_var].groupby('time_counter.year').map(doySIbreak,threshold=0.5,timedim='time_counter').rename('sibd50')
+    data['sibd85'] = data_tmp[ic_var].groupby('time_counter.year').map(doySIbreak,threshold=0.85,timedim='time_counter').rename('sibd85')
 
     return data
 
