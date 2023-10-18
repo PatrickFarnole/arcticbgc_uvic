@@ -69,6 +69,11 @@ def load_naa_sic(forcing,year,xy=None):
         ic_var = 'ileadfra2'
         factor = 1
 
+    if forcing == 'RCP85':
+        datafiles = f'/tsanta/ahaddon/data/RCP85-G510.14-G515.00-01/NAA_1d_{year}0101_{year}1231_biolog.nc'
+        ic_var = 'ileadfra2'
+        factor = 1
+
     if forcing == 'CGRF':
         datafiles = f'/net/venus/kenes/data/arcticBGC/NAA_IAMIP2/HIST_KN_CGRF_ORAS025_C524.06/NAA_1d_{year}0101_{year}1231_biolog.nc'
         ic_var = 'ileadfrad'
