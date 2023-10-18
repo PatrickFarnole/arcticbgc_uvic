@@ -157,6 +157,3 @@ def prep_sibd(data_sic,year):
     data_out['sifd85'] = data_sic.sic.groupby('time.year').map(doySI,threshold=0.85,timedim='time',breakup=False).rename('sifd85')
     
     return data_out
-
-
-
