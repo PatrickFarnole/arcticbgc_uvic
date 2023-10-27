@@ -1,0 +1,7 @@
+# data
+**/*.nc
+
+# temp files
+**/.ipynb_checkpoints
+**/__pycache__
+**/dask-worker-space
